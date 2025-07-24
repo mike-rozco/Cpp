@@ -1,0 +1,131 @@
+#include <iostream>
+
+// Global variables
+char board[3][3];
+char current_player = 'X';
+int turns = 0;
+int row, col;
+
+// Function prototypes
+bool is_winner();
+bool filled_up();
+void introduction();
+void take_turn();
+void set_position();
+void update_board();
+void change_player();
+void draw();
+void end_game();
+
+bool is_winner() {
+    // Check rows
+    for(int i = 0; i < 3; i++) {
+        if(board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != ' ') {
+            return true;
+        }
+    }
+    
+    // Check columns
+    for(int j = 0; j < 3; j++) {
+        if(board[0][j] == board[1][j] && board[1][j] == board[2][j] && board[0][j] != ' ') {
+            return true;
+        }
+    }
+    
+    // Check diagonals
+    if(board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != ' ') {
+        return true;
+    }
+    if(board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != ' ') {
+        return true;
+    }
+    
+    return false;
+}
+
+bool filled_up() {
+    return turns >= 9;
+}
+
+void introduction() {
+    // Initialize board to remove garbage values
+    for(int i = 0; i < 3; i++) {
+        for(int j = 0; j < 3; j++) {
+            board[i][j] = ' ';
+        }
+    }
+    
+    std::cout << "Welcome to Tic-Tac-Toe!\n";
+    std::cout << "Players will take turns. Enter row and column (0-2).\n\n";
+}
+
+void take_turn() {
+    draw();
+    set_position();
+    update_board();
+    turns++;  // Always increment turns after a move
+    
+    if(!is_winner() && !filled_up()) {
+        change_player();
+    }
+}
+
+void set_position() {
+    std::cout << "Player " << current_player << ", enter row and column: ";
+    std::cin >> row >> col;
+    
+    while(board[row][col] != ' ' || row > 2 || col > 2 || row < 0 || col < 0) {
+        std::cout << "Invalid input. Try again.\n";
+        std::cout << "Player " << current_player << ", enter row and column: ";
+        std::cin >> row >> col;
+    }
+}
+
+void update_board() {
+    board[row][col] = current_player;
+}
+
+void change_player() {
+    if(current_player == 'X') {
+        current_player = 'O';
+    } else {
+        current_player = 'X';
+    }
+}
+
+void draw() {
+    std::cout << "\n  0   1   2\n";
+    for(int i = 0; i < 3; i++) {
+        std::cout << i << " ";
+        for(int j = 0; j < 3; j++) {
+            std::cout << board[i][j];
+            if(j < 2) std::cout << " | ";
+        }
+        std::cout << "\n";
+        if(i < 2) std::cout << "  ---------\n";
+    }
+    std::cout << "\n";
+}
+
+void end_game() {
+    draw(); // Show final board state
+    
+    if(is_winner()) {
+        std::cout << "Player " << current_player << " wins!\n";
+    } else if(filled_up()) {
+        std::cout << "It's a draw!\n";
+    }
+}
+
+int main() {
+    introduction();
+    
+    // Game logic
+    while(!is_winner() && !filled_up()) {
+        take_turn();
+    }
+    
+    end_game();
+    
+    return 0;
+}
